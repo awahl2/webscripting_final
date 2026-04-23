@@ -67,10 +67,10 @@ export default function RecommendModal({ books, onClose, onAdd }) {
             <>
               <div><label style={labelStyle}>Recommended Title *</label><input style={inputStyle} placeholder="e.g. The Midnight Library" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} onFocus={e => (e.target.style.borderColor = "#2C2620")} onBlur={e => (e.target.style.borderColor = "#E8E4DE")} /></div>
               <div><label style={labelStyle}>Author *</label><input style={inputStyle} placeholder="e.g. Matt Haig" value={form.author} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} onFocus={e => (e.target.style.borderColor = "#2C2620")} onBlur={e => (e.target.style.borderColor = "#E8E4DE")} /></div>
-              <div><label style={labelStyle}>Why they'd like it</label><input style={inputStyle} placeholder="e.g. Same slow-burn tension and morally grey leads" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} onFocus={e => (e.target.style.borderColor = "#2C2620")} onBlur={e => (e.target.style.borderColor = "#E8E4DE")} /></div>
+              <div><label style={labelStyle}>Why they'd like it</label><input style={inputStyle} placeholder="e.g. Same slow-burn" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} onFocus={e => (e.target.style.borderColor = "#2C2620")} onBlur={e => (e.target.style.borderColor = "#E8E4DE")} /></div>
               <div>
                 <label style={labelStyle}>Tags</label>
-                <input style={inputStyle} placeholder="e.g. Dark Romance, Slow Burn, Spicy" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} onFocus={e => (e.target.style.borderColor = "#2C2620")} onBlur={e => (e.target.style.borderColor = "#E8E4DE")} />
+                <input style={inputStyle} placeholder="e.g. Romance, Slow-burn" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} onFocus={e => (e.target.style.borderColor = "#2C2620")} onBlur={e => (e.target.style.borderColor = "#E8E4DE")} />
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#C0BAB4", marginTop: "5px" }}>Separate with commas</div>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "8px", borderTop: "1px solid #F0EDE8" }}>
