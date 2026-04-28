@@ -8,13 +8,13 @@ Clone the project using Git Clone
 git clone <repository_url>
 ```
 
-## 3. Install Dependencies
+## 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-## 4. Authentication Setup
+## 3. Authentication Setup
 
 ### 1. Create a Supabase Project
 
@@ -44,54 +44,89 @@ VITE_ANTHROPIC_API_KEY=your_anthropic_key_here
 
 ```sql
 -- Create user profiles table
-create table if not exists user_profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  created_at timestamp default now()
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at timestamp DEFAULT now()
 );
 
 -- Create user books table
-create table if not exists user_books (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  title text not null,
-  author text not null,
-  pages integer default 0,
-  read boolean default false,
-  rating integer default 0,
-  genre text default '',
-  created_at timestamp default now(),
-  updated_at timestamp default now(),
-  unique(user_id, title, author)
+CREATE TABLE IF NOT EXISTS user_books (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title text NOT NULL,
+  author text NOT NULL,
+  pages integer DEFAULT 0,
+  read boolean DEFAULT false,
+  rating integer DEFAULT 0,
+  genre text DEFAULT '',
+  cover_url text,
+  isbn text,
+  created_at timestamp DEFAULT now(),
+  updated_at timestamp DEFAULT now(),
+  UNIQUE(user_id, title, author)
 );
 
 -- Enable Row Level Security
-alter table user_books enable row level security;
+ALTER TABLE user_books ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
-create policy "Users can view own books"
-  on user_books for select
-  using (auth.uid() = user_id);
+CREATE POLICY "Users can view own books"
+  ON user_books FOR SELECT
+  USING (auth.uid() = user_id);
 
-create policy "Users can insert own books"
-  on user_books for insert
-  with check (auth.uid() = user_id);
+CREATE POLICY "Users can insert own books"
+  ON user_books FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
 
-create policy "Users can update own books"
-  on user_books for update
-  using (auth.uid() = user_id);
+CREATE POLICY "Users can update own books"
+  ON user_books FOR UPDATE
+  USING (auth.uid() = user_id);
 
-create policy "Users can delete own books"
-  on user_books for delete
-  using (auth.uid() = user_id);
+CREATE POLICY "Users can delete own books"
+  ON user_books FOR DELETE
+  USING (auth.uid() = user_id);
 ```
 
-### 4. Enable Email Auth
+### 4. Setup Cover Image Storage
+
+1. In your Supabase project, go to **Storage** → **New bucket**
+2. Name it `covers` and set it to **Public**, then click **Create**
+3. Go to **SQL Editor** → **New Query** and paste the following:
+
+```sql
+CREATE POLICY "Users can upload covers"
+  ON storage.objects FOR INSERT
+  WITH CHECK (
+    bucket_id = 'covers'
+    AND auth.uid() IS NOT NULL
+  );
+
+CREATE POLICY "Users can update covers"
+  ON storage.objects FOR UPDATE
+  USING (
+    bucket_id = 'covers'
+    AND auth.uid() IS NOT NULL
+  );
+
+CREATE POLICY "Users can delete own covers"
+  ON storage.objects FOR DELETE
+  USING (
+    bucket_id = 'covers'
+    AND auth.uid() IS NOT NULL
+  );
+
+CREATE POLICY "Covers are publicly viewable"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'covers');
+```
+
+### 5. Enable Email Auth
 
 1. In your Supabase project, go to **Authentication** → **Providers**
 2. Make sure **Email** is enabled (it should be by default)
 3. Go to **Settings** and note the **Site URL** (should be your dev server URL like `http://localhost:5173`)
 
-## 5. Run the project
+## 4. Run the project
 
 ```bash
 npm run dev
