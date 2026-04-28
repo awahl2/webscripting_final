@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { fileToBase64 } from "../utils/imageUtils";
 
 const inputStyle = { width: "100%", border: "1px solid #E8E4DE", borderRadius: "6px", padding: "10px 14px", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1A1614", background: "#FDFCFB", outline: "none", transition: "border-color 0.15s", boxSizing: "border-box" };
 const labelStyle = { fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#B0AAA4", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "6px", display: "block" };
@@ -18,9 +19,19 @@ export default function EditBookModal({ book, onClose, onSave }) {
 
   const handleFile = file => { if (file) setCoverFile(file); };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.title.trim() || !form.author.trim()) return;
-    onSave({ ...book, title: form.title.trim(), author: form.author.trim(), pages: parseInt(form.pages) || 0, genre: form.genre.trim() || "Unlisted", read: form.read, coverUrl: coverFile ? URL.createObjectURL(coverFile) : book.coverUrl });
+    
+    let coverUrl = book.coverUrl;
+    if (coverFile) {
+      try {
+        coverUrl = await fileToBase64(coverFile);
+      } catch (err) {
+        console.error("Failed to convert image:", err);
+      }
+    }
+    
+    onSave({ ...book, title: form.title.trim(), author: form.author.trim(), pages: parseInt(form.pages) || 0, genre: form.genre.trim() || "Unlisted", read: form.read, coverUrl: coverUrl });
     onClose();
   };
 

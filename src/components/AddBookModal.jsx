@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { fileToBase64 } from "../utils/imageUtils";
 
 const EMPTY_FORM = { title: "", author: "", pages: "", genre: "", read: false };
 
@@ -20,13 +21,23 @@ export default function AddBookModal({ onClose, onAdd }) {
 
   const handleFile = file => { if (file) setCoverFile(file); };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.title.trim() || !form.author.trim()) return;
+    
+    let coverUrl = null;
+    if (coverFile) {
+      try {
+        coverUrl = await fileToBase64(coverFile);
+      } catch (err) {
+        console.error("Failed to convert image:", err);
+      }
+    }
+    
     onAdd({
       title: form.title.trim(), author: form.author.trim(),
       pages: parseInt(form.pages) || 0, genre: form.genre.trim() || "Unlisted",
       read: form.read, rating: 0,
-      coverUrl: coverFile ? URL.createObjectURL(coverFile) : null,
+      coverUrl: coverUrl,
     });
     onClose();
   };
