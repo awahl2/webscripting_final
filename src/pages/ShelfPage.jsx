@@ -3,13 +3,17 @@ import Footer from "../components/Footer";
 import BookCard from "../components/BookCard";
 import AddBookModal from "../components/AddBookModal";
 import Pill from "../components/Pill";
-import { addUserBook, updateUserBook, deleteUserBook, fetchUserBooks } from "../utils/api";
 
 const SORT_OPTIONS = [
   { v: "title",  asc: "Title A–Z",        desc: "Title Z–A" },
   { v: "author", asc: "Author A–Z",       desc: "Author Z–A" },
   { v: "pages",  asc: "Pages least–most", desc: "Pages most–least" },
 ];
+
+// Helper to save books to localStorage
+const saveBooks = (booksArray) => {
+  localStorage.setItem("books", JSON.stringify(booksArray));
+};
 
 export default function ShelfPage({ books, setBooks, user }) {
   const [sortField, setSortField] = useState("title");
@@ -18,81 +22,37 @@ export default function ShelfPage({ books, setBooks, user }) {
   const [search, setSearch] = useState("");
   const [addModalOpen, setAddModalOpen] = useState(false);
 
-  const toggleRead = async (id) => {
+  const toggleRead = (id) => {
     const book = books.find(x => x.id === id);
     const updated = { ...book, read: !book.read, rating: book.read ? 0 : book.rating };
-    
-    // Update local state immediately for UX
-    setBooks(b => b.map(x => x.id === id ? updated : x));
-    
-    // Sync with Supabase if logged in
-    if (user) {
-      try {
-        await updateUserBook(id, { read: updated.read, rating: updated.rating });
-      } catch (err) {
-        console.error("Failed to update book:", err);
-        // Revert on error
-        setBooks(books);
-      }
-    }
+    const newBooks = books.map(x => x.id === id ? updated : x);
+    setBooks(newBooks);
+    saveBooks(newBooks);
   };
 
-  const rateBook = async (id, r) => {
-    const book = books.find(x => x.id === id);
-    const updated = { ...book, rating: r };
-    
-    // Update local state immediately
-    setBooks(b => b.map(x => x.id === id ? updated : x));
-    
-    // Sync with Supabase if logged in
-    if (user) {
-      try {
-        await updateUserBook(id, { rating: r });
-      } catch (err) {
-        console.error("Failed to rate book:", err);
-        setBooks(books);
-      }
-    }
+  const rateBook = (id, r) => {
+    const newBooks = books.map(x => x.id === id ? { ...x, rating: r } : x);
+    setBooks(newBooks);
+    saveBooks(newBooks);
   };
 
-  const editBook = async (updated) => {
-    setBooks(b => b.map(x => x.id === updated.id ? updated : x));
-    
-    if (user) {
-      try {
-        const { title, author, pages, genre, read, rating } = updated;
-        await updateUserBook(updated.id, { title, author, pages, genre, read, rating });
-      } catch (err) {
-        console.error("Failed to edit book:", err);
-        // Revert on error
-        const userBooks = await fetchUserBooks();
-        setBooks(userBooks);
-      }
-    }
+  const editBook = (updated) => {
+    const newBooks = books.map(x => x.id === updated.id ? updated : x);
+    setBooks(newBooks);
+    saveBooks(newBooks);
   };
 
-  const addBook = async (newBook) => {
-    if (user) {
-      try {
-        const { title, author, pages, genre } = newBook;
-        const added = await addUserBook({
-          user_id: user.id,
-          title,
-          author,
-          pages: pages || 0,
-          genre: genre || "",
-          read: false,
-          rating: 0,
-        });
-        setBooks(b => [...b, added]);
-      } catch (err) {
-        console.error("Failed to add book:", err);
-        alert("Error adding book: " + err.message);
-      }
-    } else {
-      // Not logged in - add to local state only
-      setBooks(b => [...b, { ...newBook, id: Date.now() }]);
-    }
+  const addBook = (newBook) => {
+    const bookWithId = { ...newBook, id: Math.max(...books.map(b => b.id), 0) + 1 };
+    const newBooks = [...books, bookWithId];
+    setBooks(newBooks);
+    saveBooks(newBooks);
+  };
+
+  const deleteBook = (id) => {
+    const newBooks = books.filter(x => x.id !== id);
+    setBooks(newBooks);
+    saveBooks(newBooks);
   };
 
   const displayed = useMemo(() => {
@@ -171,7 +131,7 @@ export default function ShelfPage({ books, setBooks, user }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(142px, 1fr))", gap: "20px" }}>
           {displayed.map((book, i) => (
-            <BookCard key={book.id} book={book} index={i} onToggleRead={toggleRead} onRate={rateBook} onEdit={editBook} />
+            <BookCard key={book.id} book={book} index={i} onToggleRead={toggleRead} onRate={rateBook} onEdit={editBook} onDelete={deleteBook} />
           ))}
         </div>
 

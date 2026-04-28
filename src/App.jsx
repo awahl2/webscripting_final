@@ -4,7 +4,7 @@ import HomePage from "./pages/HomePage";
 import ShelfPage from "./pages/ShelfPage";
 import BlindDatePage from "./pages/BlindDatePage";
 import AuthPage from "./pages/AuthPage";
-import { fetchUserBooks, supabase } from "./utils/api";
+import { supabase } from "./utils/api";
 import INITIAL_BOOKS from "./data/books.json";
 
 // ── TEST ASSERTS ──────────────────────────────────────────────────
@@ -84,8 +84,10 @@ export default function App() {
 
         if (result.timedOut) {
           console.warn("Session hung — clearing localStorage");
-          localStorage.clear();
-          if (mounted) setLoading(false);
+          if (mounted) {
+            setBooks(INITIAL_BOOKS);
+            setLoading(false);
+          }
           return;
         }
 
@@ -93,18 +95,16 @@ export default function App() {
 
         if (session?.user) {
           setUser(session.user);
-          try {
-            const userBooks = await fetchUserBooks();
-            if (mounted) setBooks(userBooks.length > 0 ? userBooks : INITIAL_BOOKS);
-          } catch (err) {
-            console.error("Failed to fetch user books:", err);
-          }
         }
       } catch (err) {
         console.error("Auth init error:", err);
-        localStorage.clear();
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          // Load books from localStorage if they exist, otherwise use INITIAL_BOOKS
+          const savedBooks = localStorage.getItem("books");
+          setBooks(savedBooks ? JSON.parse(savedBooks) : INITIAL_BOOKS);
+          setLoading(false);
+        }
       }
     };
 
@@ -116,15 +116,11 @@ export default function App() {
 
         if (session?.user) {
           setUser(session.user);
-          try {
-            const userBooks = await fetchUserBooks();
-            if (mounted) setBooks(userBooks.length > 0 ? userBooks : INITIAL_BOOKS);
-          } catch (err) {
-            console.error("Failed to fetch user books:", err);
-          }
         } else {
           setUser(null);
-          setBooks(INITIAL_BOOKS);
+          // Load books from localStorage when logging out
+          const savedBooks = localStorage.getItem("books");
+          setBooks(savedBooks ? JSON.parse(savedBooks) : INITIAL_BOOKS);
         }
       }
     );

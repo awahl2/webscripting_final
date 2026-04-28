@@ -39,6 +39,9 @@ export async function getCurrentUser() {
 }
 
 // ── User Books (Shelf) ──
+// NOTE: Supabase user_books table operations are disabled
+// Books are now stored in local state and localStorage
+/*
 export async function fetchUserBooks() {
   const { data, error } = await supabase
     .from("user_books")
@@ -78,6 +81,7 @@ export async function deleteUserBook(bookId) {
   
   if (error) throw new Error(error.message);
 }
+*/
 
 // ── Anthropic Recommendations (existing) ──
 export async function fetchRecommendation(book) {
