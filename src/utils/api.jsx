@@ -5,25 +5,15 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
-console.log("URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
-
 // ── Authentication ──
 export async function signUp(email, password) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
+  const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function logIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw new Error(error.message);
   return data;
 }
@@ -38,52 +28,103 @@ export async function getCurrentUser() {
   return user;
 }
 
+// ── Cover Images ──
+export async function uploadCover(file, bookTitle) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Not logged in");
+
+  const ext = file.name.split(".").pop();
+  const safeName = bookTitle.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+  const filename = `${user.id}/${safeName}_${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("covers")
+    .upload(filename, file, { upsert: true });
+
+  if (error) throw new Error(error.message);
+
+  const { data } = supabase.storage.from("covers").getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+export async function deleteCover(coverUrl) {
+  if (!coverUrl || !coverUrl.includes("/covers/")) return;
+  // Extract everything after /covers/ in the URL
+  const filename = coverUrl.split("/covers/")[1];
+  if (filename) {
+    await supabase.storage.from("covers").remove([filename]);
+  }
+}
+
 // ── User Books (Shelf) ──
-// NOTE: Supabase user_books table operations are disabled
-// Books are now stored in local state and localStorage
-/*
 export async function fetchUserBooks() {
   const { data, error } = await supabase
     .from("user_books")
     .select("*")
-    .order("created_at", { ascending: false });
-  
+    .order("created_at", { ascending: true });
+
   if (error) throw new Error(error.message);
   return data || [];
 }
 
 export async function addUserBook(book) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Not logged in");
+
   const { data, error } = await supabase
     .from("user_books")
-    .insert([book])
-    .select();
-  
+    .insert([{
+      user_id: user.id,
+      title: book.title,
+      author: book.author,
+      pages: book.pages || 0,
+      genre: book.genre || "",
+      read: book.read || false,
+      rating: book.rating || 0,
+      cover_url: book.coverUrl || null,
+      isbn: book.isbn || null,
+    }])
+    .select()
+    .single();
+
   if (error) throw new Error(error.message);
-  return data?.[0];
+  return data;
 }
 
 export async function updateUserBook(bookId, updates) {
   const { data, error } = await supabase
     .from("user_books")
-    .update(updates)
+    .update({
+      title: updates.title,
+      author: updates.author,
+      pages: updates.pages || 0,
+      genre: updates.genre || "",
+      read: updates.read || false,
+      rating: updates.rating || 0,
+      cover_url: updates.coverUrl ?? null,
+      isbn: updates.isbn || null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", bookId)
-    .select();
-  
+    .select()
+    .single();
+
   if (error) throw new Error(error.message);
-  return data?.[0];
+  return data;
 }
 
-export async function deleteUserBook(bookId) {
+export async function deleteUserBook(bookId, coverUrl) {
+  await deleteCover(coverUrl);
+
   const { error } = await supabase
     .from("user_books")
     .delete()
     .eq("id", bookId);
-  
+
   if (error) throw new Error(error.message);
 }
-*/
 
-// ── Anthropic Recommendations (existing) ──
+// ── Anthropic Recommendations ──
 export async function fetchRecommendation(book) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
