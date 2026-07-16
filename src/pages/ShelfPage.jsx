@@ -80,7 +80,7 @@ export default function ShelfPage({ books, setBooks, user }) {
       {/* Page header */}
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E8E4DE", padding: "36px 48px 28px" }}>
         <h1 style={{ fontFamily: "'Lora', serif", fontSize: "36px", fontWeight: 500, color: "#1A1614", margin: "0 0 28px", letterSpacing: "-0.01em", textAlign: "center" }}>My Shelf</h1>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 250px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "0 250px" }}>
           {[
             { l: "total",      v: books.length },
             { l: "read",       v: books.filter(b => b.read).length },
