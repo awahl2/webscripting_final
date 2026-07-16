@@ -115,7 +115,7 @@ export default function BlindDatePage({ books }) {
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E8E4DE", padding: "36px 48px 32px", textAlign: "center" }}>
         <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#B0AAA4", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "10px" }}>Discover</div>
         <h1 style={{ fontFamily: "'Lora', serif", fontSize: "36px", fontWeight: 500, color: "#1A1614", margin: "0 0 10px", letterSpacing: "-0.01em" }}>Blind Date with a Book</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#8A8480", margin: "0 auto", maxWidth: "440px", lineHeight: 1.6 }}>Based on books you've loved, here are some mystery reads — peek at the hints, then reveal when you're ready.</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#8A8480", margin: "0 auto", maxWidth: "440px", lineHeight: 1.6 }}>Based on books you've loved, here are some mystery reads: peek at the hints, then reveal when you're ready.</p>
       </div>
 
       <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "32px 48px 80px", flex: 1, width: "100%", boxSizing: "border-box" }}>
@@ -130,7 +130,7 @@ export default function BlindDatePage({ books }) {
 
         {allCards.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 20px", color: "#C0BAB4", fontFamily: "'Lora', serif", fontSize: "16px", fontStyle: "italic" }}>
-            Rate some books on your shelf first — your blind dates will appear here.
+            Rate some books on your shelf first: your blind dates will appear here.
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "28px" }}>

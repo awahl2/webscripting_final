@@ -128,7 +128,7 @@ export default function HomePage({ setPage }) {
                   <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#2C2620", flexShrink: 0, marginTop: "7px" }} />
                   <div>
                     <span style={{ fontFamily: "'Lora', serif", fontSize: "14px", fontWeight: 600, color: "#1A1614" }}>{label}</span>
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8A8480" }}> — {desc}</span>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8A8480" }}>: {desc}</span>
                   </div>
                 </div>
               ))}
@@ -211,7 +211,7 @@ export default function HomePage({ setPage }) {
             <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
               {[
                 "Rate books you've read to unlock personalised recommendations.",
-                "Get AI-matched suggestions based on your taste — author, genre, and vibe.",
+                "Get AI-matched suggestions based on your taste: author, genre, and vibe.",
                 "Peek at hints before you reveal the title for a true blind date experience.",
               ].map((text, i) => (
                 <div key={i} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
