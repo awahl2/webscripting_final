@@ -15,7 +15,7 @@ export default function HomePage({ setPage }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        paddingTop: "52px",
+        paddingTop: "80px",
         overflow: "hidden",
         width: "100%",
         position: "relative",

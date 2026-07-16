@@ -38,7 +38,7 @@ export default function Header({ page, setPage, user, setUser }) {
     <header style={{
       background: "#FFFFFF", borderBottom: "1px solid #E8E4DE",
       padding: "0 60px", display: "flex", alignItems: "center",
-      justifyContent: "space-between", height: "110px",
+      justifyContent: "space-between", height: "80px",
       position: "sticky", top: 0, zIndex: 100,
     }}>
       {/* Logo */}
@@ -46,7 +46,7 @@ export default function Header({ page, setPage, user, setUser }) {
         onClick={() => setPage("home")}
         style={{ display: "flex", alignItems: "center", gap: "30px", cursor: "pointer" }}
       >
-        <img src={LOGO_SRC} alt="Story Stack" style={{ height: "100px", width: "100px", objectFit: "contain", mixBlendMode: "multiply" }} />
+        <img src={LOGO_SRC} alt="Story Stack" style={{ height: "70px", width: "70px", objectFit: "contain", mixBlendMode: "multiply" }} />
         <div style={{ fontFamily: "'Lora', serif", fontSize: "28px", fontWeight: 500, color: "#3A342F", letterSpacing: "0.01em" }}>
           Story Stack
         </div>
